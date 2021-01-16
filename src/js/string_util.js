@@ -152,6 +152,7 @@ export function parseListRow(str) {
 };
 
 export function parseWaterball(str) {
+  return parseWaterballLibido(str);
   var regex = new RegExp(/\x1b\[1;33;46m\u2605(\w+)\x1b\[0;1;37;45m (.+) \x1b\[m\x1b\[K/g);
   var result = regex.exec(str);
   if (result && result.length == 3) {
@@ -166,6 +167,40 @@ export function parseWaterball(str) {
 
   return null;
 };
+
+function parseWaterballLibido(str) {
+  // str expected: 
+  // [24;1H[1;33;46m★CodeMonkey [37;45m test [m[K[15;20H
+  // [24;1H[1;33;46m★CodeMonkey [37;45m test [m[K[16;20H
+  // twice:
+  // [1;33;46m★CodeMonkey [37;45m 測試 [m[K[24;77H
+  // [1;33;46m★CodeMonkey [37;45m ggg [m[K[24;77H
+  // NG (in waterball history):
+  // [1;33;46m★CodeMonkey [37;45m ggg [m 2021/01/16 Sat 16:33:49
+  // NG (normal state)
+  // [24;1H[34;46m          17:02 [37;44m 人數 116  我是 pichu                       [呼叫]開        [m
+  console.log("parseWaterball:",str);
+  var colorUserId = "\\x1b\\[1;33;46m"
+  var colorMessage = "\\x1b\\[37;45m"
+  var colorNormal = "\\x1b\\[m"
+  var bell = "\\x1b\\[K"
+  var regString = colorUserId + "★(\\w+) " + colorMessage + " (\\w+) " + colorNormal + bell
+  console.log("regString:", regString);
+  var regex = new RegExp(regString, 'g');
+  var result = regex.exec(str);
+
+  console.log("result:", result)
+  if (result == null){
+    console.log("result == null")
+    return
+  }
+  console.log("parseWaterball result:", result);
+  if (result.length == 3){
+    return {userId: result[1], message: result[2]};
+  }
+  return null;
+
+}
 
 export function ansiHalfColorConv(it) {
   var str = '';

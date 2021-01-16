@@ -702,8 +702,11 @@ TermView.prototype = {
     if (!this.enableNotifications) {
       return;
     }
+    if (Notification.permission != 'granted') {
+      Notification.requestPermission()
+    }
     var app = this.bbscore;
-    //console.log('message from ' + this.waterball.userId + ': ' + this.waterball.message); 
+    console.log('message from ' + app.waterball.userId + ': ' + app.waterball.message); 
     var title = app.waterball.userId + ' ' + i18n('notification_said');
     if (this.titleTimer) {
       this.titleTimer.cancel();
